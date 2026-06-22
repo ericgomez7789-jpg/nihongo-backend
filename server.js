@@ -1,6 +1,5 @@
 console.log(">>> USING CORRECT SERVER.JS <<<");
 
-
 console.log("DEBUG STRIPE KEY =", process.env.STRIPE_SECRET_KEY);
 console.log("ENV FRONTEND_URL =", process.env.FRONTEND_URL);
 
@@ -13,7 +12,7 @@ const app = express();
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
 // ------------------------------------------------------
-// GLOBAL CORS (MUST BE FIRST — BEFORE ANY ROUTES)
+// GLOBAL CORS (must be first)
 // ------------------------------------------------------
 const allowedOrigins = [
   "http://localhost:5500",
@@ -35,17 +34,17 @@ app.use(
   })
 );
 
-// JSON MUST COME AFTER CORS
+// JSON must come after CORS
 app.use(express.json());
 
-// Log origin for debugging
+// Debug incoming origin
 app.use((req, res, next) => {
   console.log("Incoming Origin:", req.headers.origin);
   next();
 });
 
 // ------------------------------------------------------
-// SUPABASE CLIENT (backend — service role key)
+// SUPABASE (backend service role key)
 // ------------------------------------------------------
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -53,7 +52,7 @@ const supabase = createClient(
 );
 
 // ------------------------------------------------------
-// STRIPE WEBHOOK (raw body only — must bypass JSON)
+// STRIPE WEBHOOK (raw body only)
 // ------------------------------------------------------
 app.post(
   "/webhook",
@@ -113,15 +112,18 @@ app.post(
 );
 
 // ------------------------------------------------------
-// CHECKOUT ROUTES (LIVE PRICE IDs)
+// CHECKOUT ROUTES
 // ------------------------------------------------------
 app.post("/create-checkout-session-basic", async (req, res) => {
   try {
+    const successUrl = `${process.env.FRONTEND_URL}/success.html`;
+    console.log("SUCCESS URL ACTUAL:", successUrl);
+
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
       line_items: [{ price: "price_1Tks2SF0QR7lUrADWGWmgIMN", quantity: 1 }],
       metadata: { plan: "basic-monthly" },
-      success_url: `${process.env.FRONTEND_URL}/success.html`,
+      success_url: successUrl,
       cancel_url: `${process.env.FRONTEND_URL}/cancel.html`,
     });
 
@@ -134,11 +136,14 @@ app.post("/create-checkout-session-basic", async (req, res) => {
 
 app.post("/create-checkout-session-basic-yearly", async (req, res) => {
   try {
+    const successUrl = `${process.env.FRONTEND_URL}/success.html`;
+    console.log("SUCCESS URL ACTUAL:", successUrl);
+
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
       line_items: [{ price: "price_1Tks2VF0QR7lUrADA6x63klX", quantity: 1 }],
       metadata: { plan: "basic-yearly" },
-      success_url: `${process.env.FRONTEND_URL}/success.html`,
+      success_url: successUrl,
       cancel_url: `${process.env.FRONTEND_URL}/cancel.html`,
     });
 
@@ -151,11 +156,14 @@ app.post("/create-checkout-session-basic-yearly", async (req, res) => {
 
 app.post("/create-checkout-session-premium", async (req, res) => {
   try {
+    const successUrl = `${process.env.FRONTEND_URL}/success.html`;
+    console.log("SUCCESS URL ACTUAL:", successUrl);
+
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
       line_items: [{ price: "price_1Tks2VF0QR7lUrADoJLkR5sW", quantity: 1 }],
       metadata: { plan: "premium-monthly" },
-      success_url: `${process.env.FRONTEND_URL}/success.html`,
+      success_url: successUrl,
       cancel_url: `${process.env.FRONTEND_URL}/cancel.html`,
     });
 
@@ -168,11 +176,14 @@ app.post("/create-checkout-session-premium", async (req, res) => {
 
 app.post("/create-checkout-session-premium-yearly", async (req, res) => {
   try {
+    const successUrl = `${process.env.FRONTEND_URL}/success.html`;
+    console.log("SUCCESS URL ACTUAL:", successUrl);
+
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
       line_items: [{ price: "price_1Tks2UF0QR7lUrADx6i7bSmn", quantity: 1 }],
       metadata: { plan: "premium-yearly" },
-      success_url: `${process.env.FRONTEND_URL}/success.html`,
+      success_url: successUrl,
       cancel_url: `${process.env.FRONTEND_URL}/cancel.html`,
     });
 
