@@ -1,6 +1,6 @@
 console.log(">>> USING CORRECT SERVER.JS <<<");
 
-require("dotenv").config();
+
 console.log("DEBUG STRIPE KEY =", process.env.STRIPE_SECRET_KEY);
 console.log("ENV FRONTEND_URL =", process.env.FRONTEND_URL);
 
