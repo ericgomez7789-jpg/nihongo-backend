@@ -13,6 +13,38 @@ const app = express();
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
 // ------------------------------------------------------
+// GLOBAL CORS (MUST BE FIRST — BEFORE ANY ROUTES)
+// ------------------------------------------------------
+const allowedOrigins = [
+  "http://localhost:5500",
+  "http://127.0.0.1:5500",
+  "https://nihongo-frontend.onrender.com"
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    credentials: true,
+  })
+);
+
+// JSON MUST COME AFTER CORS
+app.use(express.json());
+
+// Log origin for debugging
+app.use((req, res, next) => {
+  console.log("Incoming Origin:", req.headers.origin);
+  next();
+});
+
+// ------------------------------------------------------
 // SUPABASE CLIENT (backend — service role key)
 // ------------------------------------------------------
 const supabase = createClient(
@@ -21,7 +53,7 @@ const supabase = createClient(
 );
 
 // ------------------------------------------------------
-// STRIPE WEBHOOK (raw body only)
+// STRIPE WEBHOOK (raw body only — must bypass JSON)
 // ------------------------------------------------------
 app.post(
   "/webhook",
@@ -48,11 +80,7 @@ app.post(
         const plan = session.metadata.plan;
 
         console.log("🔥 Payment completed for:", email, "Plan:", plan);
-        console.log("DEBUG Stripe email:", email);
 
-        // ------------------------------------------------------
-        // UPSERT PROFILE (FIXED: now returns real data)
-        // ------------------------------------------------------
         const { data, error } = await supabase
           .from("profiles")
           .upsert(
@@ -65,7 +93,7 @@ app.post(
             { onConflict: "email" }
           )
           .select()
-          .single(); // <-- FIX: return the updated row
+          .single();
 
         if (error) {
           console.error("❌ Supabase update failed:", error);
@@ -85,48 +113,13 @@ app.post(
 );
 
 // ------------------------------------------------------
-// CORS + JSON FOR ALL NON-WEBHOOK ROUTES
-// ------------------------------------------------------
-const allowedOrigins = [
-  "http://localhost:5500",
-  "http://127.0.0.1:5500"
-];
-
-app.use((req, res, next) => {
-  if (req.path === "/webhook") return next();
-  return cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-  })(req, res, next);
-});
-
-// JSON parsing AFTER webhook
-app.use((req, res, next) => {
-  if (req.path === "/webhook") return next();
-  express.json()(req, res, next);
-});
-
-// ------------------------------------------------------
-// DEBUG: Log incoming Origin
-// ------------------------------------------------------
-app.use((req, res, next) => {
-  console.log("Incoming Origin:", req.headers.origin);
-  next();
-});
-
-// ------------------------------------------------------
-// CHECKOUT ROUTES
+// CHECKOUT ROUTES (LIVE PRICE IDs)
 // ------------------------------------------------------
 app.post("/create-checkout-session-basic", async (req, res) => {
   try {
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
-      line_items: [{ price: "price_1Tihmk2VyFuAMnh5KQZeIPAo", quantity: 1 }],
+      line_items: [{ price: "price_1Tks2SF0QR7lUrADWGWmgIMN", quantity: 1 }],
       metadata: { plan: "basic-monthly" },
       success_url: `${process.env.FRONTEND_URL}/success.html`,
       cancel_url: `${process.env.FRONTEND_URL}/cancel.html`,
@@ -143,7 +136,7 @@ app.post("/create-checkout-session-basic-yearly", async (req, res) => {
   try {
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
-      line_items: [{ price: "price_1Tihnp2VyFuAMnh5Cl2LUzPy", quantity: 1 }],
+      line_items: [{ price: "price_1Tks2VF0QR7lUrADA6x63klX", quantity: 1 }],
       metadata: { plan: "basic-yearly" },
       success_url: `${process.env.FRONTEND_URL}/success.html`,
       cancel_url: `${process.env.FRONTEND_URL}/cancel.html`,
@@ -160,7 +153,7 @@ app.post("/create-checkout-session-premium", async (req, res) => {
   try {
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
-      line_items: [{ price: "price_1Tihly2VyFuAMnh5tw2x6Vj2", quantity: 1 }],
+      line_items: [{ price: "price_1Tks2VF0QR7lUrADoJLkR5sW", quantity: 1 }],
       metadata: { plan: "premium-monthly" },
       success_url: `${process.env.FRONTEND_URL}/success.html`,
       cancel_url: `${process.env.FRONTEND_URL}/cancel.html`,
@@ -177,7 +170,7 @@ app.post("/create-checkout-session-premium-yearly", async (req, res) => {
   try {
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
-      line_items: [{ price: "price_1Tihoi2VyFuAMnh5PMjUk8Z4", quantity: 1 }],
+      line_items: [{ price: "price_1Tks2UF0QR7lUrADx6i7bSmn", quantity: 1 }],
       metadata: { plan: "premium-yearly" },
       success_url: `${process.env.FRONTEND_URL}/success.html`,
       cancel_url: `${process.env.FRONTEND_URL}/cancel.html`,
