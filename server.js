@@ -12,10 +12,10 @@ const app = express();
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
 // ------------------------------------------------------
-// LIVE PRICE IDS (replace with your actual live IDs)
+// LIVE PRICE IDS
 // ------------------------------------------------------
 const PRICE_BASIC_MONTHLY = "price_1TlBUbF0QR7lUrADu8FP6yM1";
-const PRICE_BASIC_YEARLY = "price_1TlBXXF0QR7lUrADxxxxxxx";   // replace with your real one
+const PRICE_BASIC_YEARLY = "price_1TlBbjF0QR7lUrADrlQe2ofJ";
 const PRICE_PREMIUM_MONTHLY = "price_1TlBYLF0QR7lUrADmaomRX3l";
 const PRICE_PREMIUM_YEARLY = "price_1TlBfuF0QR7lUrAD1IGmLGrI";
 
@@ -119,16 +119,29 @@ app.post(
 );
 
 // ------------------------------------------------------
-// CHECKOUT ROUTES (LIVE MODE)
+// CHECKOUT ROUTES (WITH DEBUG LOGS)
 // ------------------------------------------------------
+function logStripeURLs(label, success_url, cancel_url) {
+  console.log(`\n===== ${label} =====`);
+  console.log("SUCCESS URL BEING SENT TO STRIPE:", success_url);
+  console.log("CANCEL URL BEING SENT TO STRIPE:", cancel_url);
+  console.log("==============================\n");
+}
+
+// BASIC MONTHLY
 app.post("/create-checkout-session-basic", async (req, res) => {
   try {
+    const success_url = `${process.env.FRONTEND_URL}/success.html`;
+    const cancel_url = `${process.env.FRONTEND_URL}/cancel.html`;
+
+    logStripeURLs("BASIC MONTHLY CHECKOUT", success_url, cancel_url);
+
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
       line_items: [{ price: PRICE_BASIC_MONTHLY, quantity: 1 }],
       metadata: { plan: "basic-monthly" },
-      success_url: `${process.env.FRONTEND_URL}/success.html`,
-      cancel_url: `${process.env.FRONTEND_URL}/cancel.html`,
+      success_url,
+      cancel_url,
     });
 
     res.json({ url: session.url });
@@ -138,14 +151,20 @@ app.post("/create-checkout-session-basic", async (req, res) => {
   }
 });
 
+// BASIC YEARLY
 app.post("/create-checkout-session-basic-yearly", async (req, res) => {
   try {
+    const success_url = `${process.env.FRONTEND_URL}/success.html`;
+    const cancel_url = `${process.env.FRONTEND_URL}/cancel.html`;
+
+    logStripeURLs("BASIC YEARLY CHECKOUT", success_url, cancel_url);
+
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
       line_items: [{ price: PRICE_BASIC_YEARLY, quantity: 1 }],
       metadata: { plan: "basic-yearly" },
-      success_url: `${process.env.FRONTEND_URL}/success.html`,
-      cancel_url: `${process.env.FRONTEND_URL}/cancel.html`,
+      success_url,
+      cancel_url,
     });
 
     res.json({ url: session.url });
@@ -155,14 +174,20 @@ app.post("/create-checkout-session-basic-yearly", async (req, res) => {
   }
 });
 
+// PREMIUM MONTHLY
 app.post("/create-checkout-session-premium", async (req, res) => {
   try {
+    const success_url = `${process.env.FRONTEND_URL}/success.html`;
+    const cancel_url = `${process.env.FRONTEND_URL}/cancel.html`;
+
+    logStripeURLs("PREMIUM MONTHLY CHECKOUT", success_url, cancel_url);
+
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
       line_items: [{ price: PRICE_PREMIUM_MONTHLY, quantity: 1 }],
       metadata: { plan: "premium-monthly" },
-      success_url: `${process.env.FRONTEND_URL}/success.html`,
-      cancel_url: `${process.env.FRONTEND_URL}/cancel.html`,
+      success_url,
+      cancel_url,
     });
 
     res.json({ url: session.url });
@@ -172,14 +197,20 @@ app.post("/create-checkout-session-premium", async (req, res) => {
   }
 });
 
+// PREMIUM YEARLY
 app.post("/create-checkout-session-premium-yearly", async (req, res) => {
   try {
+    const success_url = `${process.env.FRONTEND_URL}/success.html`;
+    const cancel_url = `${process.env.FRONTEND_URL}/cancel.html`;
+
+    logStripeURLs("PREMIUM YEARLY CHECKOUT", success_url, cancel_url);
+
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
       line_items: [{ price: PRICE_PREMIUM_YEARLY, quantity: 1 }],
       metadata: { plan: "premium-yearly" },
-      success_url: `${process.env.FRONTEND_URL}/success.html`,
-      cancel_url: `${process.env.FRONTEND_URL}/cancel.html`,
+      success_url,
+      cancel_url,
     });
 
     res.json({ url: session.url });
