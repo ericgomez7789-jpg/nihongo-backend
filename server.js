@@ -12,7 +12,15 @@ const app = express();
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
 // ------------------------------------------------------
-// GLOBAL CORS (must be first)
+// LIVE PRICE IDS (replace with your actual live IDs)
+// ------------------------------------------------------
+const PRICE_BASIC_MONTHLY = "price_1TlBUbF0QR7lUrADu8FP6yM1";
+const PRICE_BASIC_YEARLY = "price_1TlBXXF0QR7lUrADxxxxxxx";   // replace with your real one
+const PRICE_PREMIUM_MONTHLY = "price_1TlBYLF0QR7lUrADmaomRX3l";
+const PRICE_PREMIUM_YEARLY = "price_1TlBfuF0QR7lUrAD1IGmLGrI";
+
+// ------------------------------------------------------
+// GLOBAL CORS
 // ------------------------------------------------------
 const allowedOrigins = [
   "http://localhost:5500",
@@ -34,7 +42,6 @@ app.use(
   })
 );
 
-// JSON must come after CORS
 app.use(express.json());
 
 // Debug incoming origin
@@ -44,7 +51,7 @@ app.use((req, res, next) => {
 });
 
 // ------------------------------------------------------
-// SUPABASE (backend service role key)
+// SUPABASE
 // ------------------------------------------------------
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -52,7 +59,7 @@ const supabase = createClient(
 );
 
 // ------------------------------------------------------
-// STRIPE WEBHOOK (raw body only)
+// STRIPE WEBHOOK
 // ------------------------------------------------------
 app.post(
   "/webhook",
@@ -112,18 +119,15 @@ app.post(
 );
 
 // ------------------------------------------------------
-// CHECKOUT ROUTES
+// CHECKOUT ROUTES (LIVE MODE)
 // ------------------------------------------------------
 app.post("/create-checkout-session-basic", async (req, res) => {
   try {
-    const successUrl = `${process.env.FRONTEND_URL}/success.html`;
-    console.log("SUCCESS URL ACTUAL:", successUrl);
-
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
-      line_items: [{ price: "price_1Tks2SF0QR7lUrADWGWmgIMN", quantity: 1 }],
+      line_items: [{ price: PRICE_BASIC_MONTHLY, quantity: 1 }],
       metadata: { plan: "basic-monthly" },
-      success_url: successUrl,
+      success_url: `${process.env.FRONTEND_URL}/success.html`,
       cancel_url: `${process.env.FRONTEND_URL}/cancel.html`,
     });
 
@@ -136,14 +140,11 @@ app.post("/create-checkout-session-basic", async (req, res) => {
 
 app.post("/create-checkout-session-basic-yearly", async (req, res) => {
   try {
-    const successUrl = `${process.env.FRONTEND_URL}/success.html`;
-    console.log("SUCCESS URL ACTUAL:", successUrl);
-
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
-      line_items: [{ price: "price_1Tks2VF0QR7lUrADA6x63klX", quantity: 1 }],
+      line_items: [{ price: PRICE_BASIC_YEARLY, quantity: 1 }],
       metadata: { plan: "basic-yearly" },
-      success_url: successUrl,
+      success_url: `${process.env.FRONTEND_URL}/success.html`,
       cancel_url: `${process.env.FRONTEND_URL}/cancel.html`,
     });
 
@@ -156,14 +157,11 @@ app.post("/create-checkout-session-basic-yearly", async (req, res) => {
 
 app.post("/create-checkout-session-premium", async (req, res) => {
   try {
-    const successUrl = `${process.env.FRONTEND_URL}/success.html`;
-    console.log("SUCCESS URL ACTUAL:", successUrl);
-
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
-      line_items: [{ price: "price_1Tks2VF0QR7lUrADoJLkR5sW", quantity: 1 }],
+      line_items: [{ price: PRICE_PREMIUM_MONTHLY, quantity: 1 }],
       metadata: { plan: "premium-monthly" },
-      success_url: successUrl,
+      success_url: `${process.env.FRONTEND_URL}/success.html`,
       cancel_url: `${process.env.FRONTEND_URL}/cancel.html`,
     });
 
@@ -176,14 +174,11 @@ app.post("/create-checkout-session-premium", async (req, res) => {
 
 app.post("/create-checkout-session-premium-yearly", async (req, res) => {
   try {
-    const successUrl = `${process.env.FRONTEND_URL}/success.html`;
-    console.log("SUCCESS URL ACTUAL:", successUrl);
-
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
-      line_items: [{ price: "price_1Tks2UF0QR7lUrADx6i7bSmn", quantity: 1 }],
+      line_items: [{ price: PRICE_PREMIUM_YEARLY, quantity: 1 }],
       metadata: { plan: "premium-yearly" },
-      success_url: successUrl,
+      success_url: `${process.env.FRONTEND_URL}/success.html`,
       cancel_url: `${process.env.FRONTEND_URL}/cancel.html`,
     });
 
