@@ -72,16 +72,34 @@ app.post(
 
         console.log("🔥 Payment completed for:", email, "Plan:", plan);
 
+        // ------------------------------------------------------
+        // FIXED MEMBERSHIP UPDATE LOGIC
+        // ------------------------------------------------------
+
+        // 1. Find the Supabase user by email
+        const { data: user, error: userError } = await supabase
+          .from("auth.users")
+          .select("id")
+          .eq("email", email)
+          .single();
+
+        if (userError || !user) {
+          console.error("❌ No Supabase user found for email:", email);
+          return res.status(400).send("User not found");
+        }
+
+        // 2. Update the profile using the user's id
         const { data, error } = await supabase
           .from("profiles")
           .upsert(
             {
+              id: user.id, // <-- CRITICAL
               email,
               membership_status: "active",
               membership_plan: plan,
               stripe_session_id: session.id
             },
-            { onConflict: "email" }
+            { onConflict: "id" }
           )
           .select()
           .single();
