@@ -20,7 +20,7 @@ const PRICE_PREMIUM_MONTHLY = "price_1TlBYLF0QR7lUrADmaomRX3l";
 const PRICE_PREMIUM_YEARLY = "price_1TlBfuF0QR7lUrAD1IGmLGrI";
 
 // ------------------------------------------------------
-// GLOBAL CORS
+// CORS
 // ------------------------------------------------------
 const allowedOrigins = [
   "http://localhost:5500",
@@ -42,24 +42,9 @@ app.use(
   })
 );
 
-app.use(express.json());
-
-// Debug incoming origin
-app.use((req, res, next) => {
-  console.log("Incoming Origin:", req.headers.origin);
-  next();
-});
-
 // ------------------------------------------------------
-// SUPABASE
-// ------------------------------------------------------
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-);
-
-// ------------------------------------------------------
-// STRIPE WEBHOOK
+// *** IMPORTANT ***
+// STRIPE WEBHOOK MUST COME BEFORE express.json()
 // ------------------------------------------------------
 app.post(
   "/webhook",
@@ -119,7 +104,26 @@ app.post(
 );
 
 // ------------------------------------------------------
-// CHECKOUT ROUTES (WITH DEBUG LOGS)
+// JSON PARSER MUST COME AFTER WEBHOOK
+// ------------------------------------------------------
+app.use(express.json());
+
+// Debug incoming origin
+app.use((req, res, next) => {
+  console.log("Incoming Origin:", req.headers.origin);
+  next();
+});
+
+// ------------------------------------------------------
+// SUPABASE
+// ------------------------------------------------------
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY
+);
+
+// ------------------------------------------------------
+// CHECKOUT ROUTES
 // ------------------------------------------------------
 function logStripeURLs(label, success_url, cancel_url) {
   console.log(`\n===== ${label} =====`);
