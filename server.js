@@ -12,6 +12,14 @@ const app = express();
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
 // ------------------------------------------------------
+// SUPABASE (MUST COME BEFORE WEBHOOK)
+// ------------------------------------------------------
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY
+);
+
+// ------------------------------------------------------
 // LIVE PRICE IDS
 // ------------------------------------------------------
 const PRICE_BASIC_MONTHLY = "price_1TlBUbF0QR7lUrADu8FP6yM1";
@@ -43,8 +51,7 @@ app.use(
 );
 
 // ------------------------------------------------------
-// *** IMPORTANT ***
-// STRIPE WEBHOOK MUST COME BEFORE express.json()
+// STRIPE WEBHOOK (MUST COME BEFORE express.json())
 // ------------------------------------------------------
 app.post(
   "/webhook",
@@ -131,14 +138,6 @@ app.use((req, res, next) => {
   console.log("Incoming Origin:", req.headers.origin);
   next();
 });
-
-// ------------------------------------------------------
-// SUPABASE
-// ------------------------------------------------------
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-);
 
 // ------------------------------------------------------
 // CHECKOUT ROUTES
