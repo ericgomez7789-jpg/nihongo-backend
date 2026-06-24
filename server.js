@@ -1,5 +1,4 @@
 console.log(">>> USING CORRECT SERVER.JS <<<");
-
 console.log("DEBUG STRIPE KEY =", process.env.STRIPE_SECRET_KEY);
 console.log("ENV FRONTEND_URL =", process.env.FRONTEND_URL);
 
@@ -71,9 +70,18 @@ app.post(
       return res.status(400).send(`Webhook Error: ${err.message}`);
     }
 
+    console.log("\n===== WEBHOOK EVENT RECEIVED =====");
+    console.log("Event Type:", event.type);
+
     switch (event.type) {
       case "checkout.session.completed": {
         const session = event.data.object;
+
+        // 🔥 NEW DEBUG LOGS
+        console.log("RAW SESSION:", JSON.stringify(session, null, 2));
+        console.log("RAW EMAIL:", JSON.stringify(session.customer_details?.email));
+        console.log("RAW METADATA:", JSON.stringify(session.metadata));
+
         const email = session.customer_details.email;
         const plan = session.metadata.plan;
 
@@ -100,7 +108,7 @@ app.post(
           .from("profiles")
           .upsert(
             {
-              id: user.id, // <-- CRITICAL
+              id: user.id,
               email,
               membership_status: "active",
               membership_plan: plan,
