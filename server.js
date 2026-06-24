@@ -93,7 +93,7 @@ app.post(
 
         // 1. Find the Supabase user by email
         const { data: user, error: userError } = await supabase
-          .from("auth.users")
+         .from("profiles")
           .select("id")
           .eq("email", email)
           .single();
