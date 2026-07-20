@@ -15,8 +15,9 @@ const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 // ------------------------------------------------------
 const supabase = createClient(
   process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
+  process.env.SUPABASE_SECRET_KEY
 );
+
 
 // ------------------------------------------------------
 // LIVE PRICE IDS
@@ -32,7 +33,8 @@ const PRICE_PREMIUM_YEARLY = "price_1TlBfuF0QR7lUrAD1IGmLGrI";
 const allowedOrigins = [
   "http://localhost:5500",
   "http://127.0.0.1:5500",
-  "https://nihongo-frontend.onrender.com"
+  "https://nihongo-frontend.onrender.com",
+  "https://torismethod.com"   // ← ADD THIS
 ];
 
 app.use(
