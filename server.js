@@ -1,7 +1,5 @@
 require("dotenv").config();
 
-
-
 console.log(">>> USING CORRECT SERVER.JS <<<");
 console.log("DEBUG STRIPE KEY =", process.env.STRIPE_SECRET_KEY);
 console.log("ENV FRONTEND_URL =", process.env.FRONTEND_URL);
@@ -22,8 +20,6 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
-
-
 // ------------------------------------------------------
 // LIVE PRICE IDS
 // ------------------------------------------------------
@@ -39,7 +35,7 @@ const allowedOrigins = [
   "http://localhost:5500",
   "http://127.0.0.1:5500",
   "https://nihongo-frontend.onrender.com",
-  "https://torismethod.com"   // ← ADD THIS
+  "https://torismethod.com"
 ];
 
 app.use(
@@ -84,7 +80,6 @@ app.post(
       case "checkout.session.completed": {
         const session = event.data.object;
 
-        // 🔥 NEW DEBUG LOGS
         console.log("RAW SESSION:", JSON.stringify(session, null, 2));
         console.log("RAW EMAIL:", JSON.stringify(session.customer_details?.email));
         console.log("RAW METADATA:", JSON.stringify(session.metadata));
@@ -94,13 +89,9 @@ app.post(
 
         console.log("🔥 Payment completed for:", email, "Plan:", plan);
 
-        // ------------------------------------------------------
-        // FIXED MEMBERSHIP UPDATE LOGIC
-        // ------------------------------------------------------
-
         // 1. Find the Supabase user by email
         const { data: user, error: userError } = await supabase
-         .from("profiles")
+          .from("profiles")
           .select("id")
           .eq("email", email)
           .single();
@@ -110,7 +101,7 @@ app.post(
           return res.status(400).send("User not found");
         }
 
-        // 2. Update the profile using the user's id
+        // 2. Update membership
         const { data, error } = await supabase
           .from("profiles")
           .upsert(
@@ -167,8 +158,8 @@ function logStripeURLs(label, success_url, cancel_url) {
 // BASIC MONTHLY
 app.post("/create-checkout-session-basic", async (req, res) => {
   try {
-    const success_url = `${process.env.FRONTEND_URL}/success.html`;
-    const cancel_url = `${process.env.FRONTEND_URL}/cancel.html`;
+    const success_url = `${process.env.FRONTEND_URL}/japanese_home.html`;
+    const cancel_url = `${process.env.FRONTEND_URL}/membership.html`;
 
     logStripeURLs("BASIC MONTHLY CHECKOUT", success_url, cancel_url);
 
@@ -190,8 +181,8 @@ app.post("/create-checkout-session-basic", async (req, res) => {
 // BASIC YEARLY
 app.post("/create-checkout-session-basic-yearly", async (req, res) => {
   try {
-    const success_url = `${process.env.FRONTEND_URL}/success.html`;
-    const cancel_url = `${process.env.FRONTEND_URL}/cancel.html`;
+    const success_url = `${process.env.FRONTEND_URL}/japanese_home.html`;
+    const cancel_url = `${process.env.FRONTEND_URL}/membership.html`;
 
     logStripeURLs("BASIC YEARLY CHECKOUT", success_url, cancel_url);
 
@@ -213,8 +204,8 @@ app.post("/create-checkout-session-basic-yearly", async (req, res) => {
 // PREMIUM MONTHLY
 app.post("/create-checkout-session-premium", async (req, res) => {
   try {
-    const success_url = `${process.env.FRONTEND_URL}/success.html`;
-    const cancel_url = `${process.env.FRONTEND_URL}/cancel.html`;
+    const success_url = `${process.env.FRONTEND_URL}/japanese_home.html`;
+    const cancel_url = `${process.env.FRONTEND_URL}/membership.html`;
 
     logStripeURLs("PREMIUM MONTHLY CHECKOUT", success_url, cancel_url);
 
@@ -236,8 +227,8 @@ app.post("/create-checkout-session-premium", async (req, res) => {
 // PREMIUM YEARLY
 app.post("/create-checkout-session-premium-yearly", async (req, res) => {
   try {
-    const success_url = `${process.env.FRONTEND_URL}/success.html`;
-    const cancel_url = `${process.env.FRONTEND_URL}/cancel.html`;
+    const success_url = `${process.env.FRONTEND_URL}/japanese_home.html`;
+    const cancel_url = `${process.env.FRONTEND_URL}/membership.html`;
 
     logStripeURLs("PREMIUM YEARLY CHECKOUT", success_url, cancel_url);
 
