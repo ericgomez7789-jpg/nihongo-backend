@@ -105,20 +105,19 @@ app.post(
 
 
 
-// 2. Update membership
+// 2. Update membership inside profiles
 const { data, error } = await supabase
   .from("profiles")
-  .upsert(
-    {
-      id: user.id,
-      email,
-      membership_status: "active",
-      membership_plan: plan
-    },
-    { onConflict: "id" }
-  )
+  .update({
+    membership_status: "active",
+    membership_plan: plan,
+    stripe_customer_id: session.customer,            // <-- CRITICAL
+    stripe_subscription_id: session.subscription     // <-- CRITICAL
+  })
+  .eq("id", user.id)
   .select()
   .single();
+
 
 
 
