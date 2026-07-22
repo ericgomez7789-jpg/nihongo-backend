@@ -101,21 +101,30 @@ app.post(
           return res.status(400).send("User not found");
         }
 
-        // 2. Update membership
-        const { data, error } = await supabase
-          .from("profiles")
-          .upsert(
-            {
-              id: user.id,
-              email,
-              membership_status: "active",
-              membership_plan: plan,
-              stripe_session_id: session.id
-            },
-            { onConflict: "id" }
-          )
-          .select()
-          .single();
+
+
+
+
+// 2. Update membership
+const { data, error } = await supabase
+  .from("profiles")
+  .upsert(
+    {
+      id: user.id,
+      email,
+      membership_status: "active",
+      membership_plan: plan
+    },
+    { onConflict: "id" }
+  )
+  .select()
+  .single();
+
+
+
+
+
+
 
         if (error) {
           console.error("❌ Supabase update failed:", error);
