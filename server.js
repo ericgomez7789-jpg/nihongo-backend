@@ -101,29 +101,18 @@ app.post(
           return res.status(400).send("User not found");
         }
 
-
-
-
-
-// 2. Update membership inside profiles
-const { data, error } = await supabase
-  .from("profiles")
-  .update({
-    membership_status: "active",
-    membership_plan: plan,
-    stripe_customer_id: session.customer,            // <-- CRITICAL
-    stripe_subscription_id: session.subscription     // <-- CRITICAL
-  })
-  .eq("id", user.id)
-  .select()
-  .single();
-
-
-
-
-
-
-
+        // 2. Update membership inside profiles
+        const { data, error } = await supabase
+          .from("profiles")
+          .update({
+            membership_status: "active",
+            membership_plan: plan,
+            stripe_customer_id: session.customer,
+            stripe_subscription_id: session.subscription
+          })
+          .eq("id", user.id)
+          .select()
+          .single();
 
         if (error) {
           console.error("❌ Supabase update failed:", error);
